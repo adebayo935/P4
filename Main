@@ -1,0 +1,121 @@
+import datetime
+from operator import itemgetter, attrgetter
+
+class Joueur:
+    def __init__(self, prenom, nom, date, sexe, classement):
+        self.nom = str(nom)
+        self.prenom = str(prenom)
+        self.date = date
+        self.sexe = sexe
+        self.classement = int(classement)
+
+    def __lt__(self, other):
+        return self.classement < other.classement
+
+players = []
+players.append(Joueur("Will","Smith","25/11/1993","Homme","1"))
+players.append(Joueur("Anna", "Smith", "25/11/1996", "Femme", "2"))
+players.append(Joueur("Jordan", "Smoth", "25/12/1993", "Homme", "3"))
+players.append(Joueur("Julia", "Mith", "25/11/1982", "Femme", "4"))
+players.append(Joueur("William", "Sith", "25/11/1973", "Homme", "5"))
+players.append(Joueur("Wanda", "Sink", "25/11/1999", "Femme", "6"))
+players.append(Joueur("Wallace", "Sorad", "25/11/1991", "Homme", "7"))
+players.append(Joueur("Soraya", "Koral", "25/11/1994", "Femme", "8"))
+players.sort()
+
+
+class Tournoi:
+    def __init__(self, nom, lieu, joueurs, date_fin, tournee, temps, description):
+        self.nom = nom
+        self.lieu = lieu
+        self.joueurs = joueurs
+        self.date_debut = str(datetime.datetime.now())
+        self.date_fin = str(date_fin)
+        self.nb_tour = 4
+        self.tournee = tournee
+        self.temps = temps
+        self.description = str(description)
+
+
+class Tour:
+    def __init__(self, liste_matchs, nom):
+        self.liste_matchs = liste_matchs
+        self.nom = nom
+        self.date_debut = str(datetime.datetime.now())
+        self.date_fin = 0
+
+
+class Match:
+    def __init__(self, joueur1,joueur2, score_p1,score_p2):
+        self.joueur1 = joueur1
+        self.joueur2 = joueur2
+        self.score_p1 = score_p1
+        self.score_p2 = score_p2
+
+
+def main():
+
+    players_names = []
+    for player in players:
+        players_names.append(player.prenom)
+
+    players_rank = []
+    for player in players:
+        players_rank.append(player.classement)
+
+    players_sup = []
+    players_inf = []
+
+    for i in range(0,4):
+        players_sup.append(players_names[i])
+    for i in range(4,8):
+        players_inf.append(players_names[i])
+    noms_matchs = []
+    for i in range(0,4):
+        noms_matchs.append(players_sup[i] + " Versus " + players_inf[i])
+    print(noms_matchs)
+
+    matchs = []
+    matchs.append(Match(players_sup[0],players_inf[0],0,1))
+    print("Match 1: " + matchs[0].joueur1 + "/" + matchs[0].joueur2 + " : " + str(matchs[0].score_p1)+"/"+str(matchs[0].score_p2))
+    matchs.append(Match(players_sup[1],players_inf[1],0,1))
+    #print("Match 2: " + matchs[1].joueurs + " : " + str(matchs[0].score_p1)+"/"+str(matchs[0].score_p2))
+    matchs.append(Match(players_sup[2],players_inf[0],0,1))
+    #print("Match 3: " + matchs[0].joueurs + " : " + str(matchs[0].score_p1)+"/"+str(matchs[0].score_p2))
+    matchs.append(Match(players_sup[3],players_inf[1],0,1))
+    #print("Match 4: " + matchs[1].joueurs + " : " + str(matchs[0].score_p1)+"/"+str(matchs[0].score_p2))
+    matchs = tuple(matchs)
+
+    liste_matchs = []
+    for match in matchs:
+        liste_matchs.append(((match.joueur1,match.score_p1),(match.joueur2,match.score_p2)))
+    print(liste_matchs)
+
+    scores_rank = list(x for t in liste_matchs for x in t)
+    scores_rank = tuple(scores_rank)
+    print(scores_rank)
+    print(scores_rank[0][1])
+    print(scores_rank[7][1])
+    scor = list(x for t in scores_rank for x in t)
+    scor = tuple(scor)
+    print(scor)
+    #for i in range(0,8):
+    #   scores_rank.append(scores_rank[i][i])
+    sorted(scores_rank, key=attrgetter("score_p2"))
+    print(scores_rank)
+
+    tournees = []
+    tournees.append(Tour(liste_matchs,"Round 1"))
+
+
+   # for tour in tournees:
+   #     print(tour.nom)
+   # print(tournees)
+    #tour1 = Tour(liste_matchs,"Round 1")
+
+#    tournoi = Tournoi("Mortal Kombat","Paris",players,"17/08",tournees,"Blitz","Combat Ultime")
+    #for joueur in tournoi.joueurs:
+       # print(joueur.prenom + " " + joueur.nom)
+
+main()
+
