@@ -12,25 +12,32 @@ class Joueur:
     def __lt__(self, other):
         return self.classement < other.classement
 
-players = []
-players.append(Joueur("Will","Smith","25/11/1993","Homme","1"))
-players.append(Joueur("Anna", "Smith", "25/11/1996", "Femme", "2"))
-players.append(Joueur("Jordan", "Smoth", "25/12/1993", "Homme", "3"))
-players.append(Joueur("Julia", "Mith", "25/11/1982", "Femme", "4"))
-players.append(Joueur("William", "Sith", "25/11/1973", "Homme", "5"))
-players.append(Joueur("Wanda", "Sink", "25/11/1999", "Femme", "6"))
-players.append(Joueur("Wallace", "Sorad", "25/11/1991", "Homme", "7"))
-players.append(Joueur("Soraya", "Koral", "25/11/1994", "Femme", "8"))
-players.sort()
+    def players(players):
+        return players
+
+
+def create_players():
+    joueurs = []
+    for i in range(0,8):
+        print("Joueur "+str(i+1))
+        prenom = input("Entrez le prenom :")
+        nom = input("Entrez le nom :")
+        date = input("Entrez la date de naissance :")
+        sexe = input("Entrez le sexe :")
+        classement = input("Entrez le classement :")
+        joueurs.append(Joueur(prenom,nom,date,sexe,classement))
+    return joueurs
 
 
 class Tournoi:
-    def __init__(self, nom, lieu, joueurs, date_fin, tournee, temps, description):
+
+    date_fin = str()
+    date_debut = str()
+
+    def __init__(self, nom, lieu, joueurs, tournee, temps, description):
         self.nom = nom
         self.lieu = lieu
         self.joueurs = joueurs
-        self.date_debut = str(datetime.datetime.now())
-        self.date_fin = str(date_fin)
         self.nb_tour = 4
         self.tournee = tournee
         self.temps = temps
@@ -45,6 +52,12 @@ class Tour:
         self.date_fin = 0
 
 
+def add_tour(tours,liste_matchs):
+    nom = input("Entrez le nom du tour : ")
+    tours.append(Tour(liste_matchs,nom))
+    print(tours)
+
+
 class Match:
     def __init__(self, joueur1,joueur2, score_p1,score_p2):
         self.joueur1 = joueur1
@@ -53,69 +66,113 @@ class Match:
         self.score_p2 = score_p2
 
 
-def main():
-
-    players_names = []
-    for player in players:
-        players_names.append(player.prenom)
-
-    players_rank = []
-    for player in players:
-        players_rank.append(player.classement)
-
+def first_round(joueurs):
     players_sup = []
     players_inf = []
 
-    for i in range(0,4):
-        players_sup.append(players_names[i])
-    for i in range(4,8):
-        players_inf.append(players_names[i])
+    for i in range(0, 4):
+        players_sup.append(joueurs[i])
+    for i in range(4, 8):
+        players_inf.append(joueurs[i])
+
     noms_matchs = []
-    for i in range(0,4):
-        noms_matchs.append(players_sup[i] + " Versus " + players_inf[i])
+    matchs = []
+    for i in range(0, 4):
+        noms_matchs.append(players_sup[i].prenom + " Versus " + players_inf[i].prenom)
     print(noms_matchs)
 
+    for i in range(0, 4):
+        print("Match " + str(i+1) + " " + str(noms_matchs[i]))
+        score_p1 = input("Score J1: ")
+        score_p2 = input("Score J2: ")
+        matchs.append(Match(players_sup[i], players_inf[i], score_p1, score_p2))
+    return matchs
+
+
+def get_ranking(previous_matchs):
+    ranking = []
+    winners = []
+    tied = []
+    losers = []
+    for i in range(0,4):
+        if previous_matchs[i].score_p1 > previous_matchs[i].score_p2:
+            winners.append(previous_matchs[i].joueur1)
+            losers.append(previous_matchs[i].joueur2)
+        elif previous_matchs[i].score_p2 > previous_matchs[i].score_p1:
+            winners.append(previous_matchs[i].joueur2)
+            losers.append(previous_matchs[i].joueur1)
+        else:
+            tied.append(previous_matchs[i].joueur1)
+            tied.append(previous_matchs[i].joueur2)
+
+    winners.sort()
+    losers.sort()
+    tied.sort()
+
+    for winner in winners:
+        ranking.append(winner)
+    for player in tied:
+        ranking.append(player)
+    for loser in losers:
+        ranking.append(loser)
+
+    for i in range(0, 8):
+        print("Classé " + str(i + 1) + ": " + ranking[i].prenom)
+    return ranking
+
+
+def next_round(ranking):
+    noms_matchs = []
     matchs = []
-    matchs.append(Match(players_sup[0],players_inf[0],0,1))
-    print("Match 1: " + matchs[0].joueur1 + "/" + matchs[0].joueur2 + " : " + str(matchs[0].score_p1)+"/"+str(matchs[0].score_p2))
-    matchs.append(Match(players_sup[1],players_inf[1],0,1))
-    #print("Match 2: " + matchs[1].joueurs + " : " + str(matchs[0].score_p1)+"/"+str(matchs[0].score_p2))
-    matchs.append(Match(players_sup[2],players_inf[0],0,1))
-    #print("Match 3: " + matchs[0].joueurs + " : " + str(matchs[0].score_p1)+"/"+str(matchs[0].score_p2))
-    matchs.append(Match(players_sup[3],players_inf[1],0,1))
-    #print("Match 4: " + matchs[1].joueurs + " : " + str(matchs[0].score_p1)+"/"+str(matchs[0].score_p2))
-    matchs = tuple(matchs)
+    noms_matchs.append(ranking[0].prenom + " Versus " + ranking[1].prenom)
+    noms_matchs.append(ranking[2].prenom + " Versus " + ranking[3].prenom)
+    noms_matchs.append(ranking[4].prenom + " Versus " + ranking[5].prenom)
+    noms_matchs.append(ranking[6].prenom + " Versus " + ranking[7].prenom)
+    print(noms_matchs)
 
-    liste_matchs = []
-    for match in matchs:
-        liste_matchs.append(((match.joueur1,match.score_p1),(match.joueur2,match.score_p2)))
-    print(liste_matchs)
+    for i in range(0, 4):
+        print("Match " + str(i+1) + " " + str(noms_matchs[i]))
+        score_p1 = input("Score J1: ")
+        score_p2 = input("Score J2: ")
+        matchs.append(Match(ranking[0],ranking[1],score_p1,score_p2))
+        matchs.append(Match(ranking[2],ranking[3],score_p1,score_p2))
+        matchs.append(Match(ranking[4],ranking[5],score_p1,score_p2))
+        matchs.append(Match(ranking[6],ranking[7],score_p1,score_p2))
+    return matchs
 
-    scores_rank = list(x for t in liste_matchs for x in t)
-    scores_rank = tuple(scores_rank)
-    print(scores_rank)
-    print(scores_rank[0][1])
-    print(scores_rank[7][1])
-    scor = list(x for t in scores_rank for x in t)
-    scor = tuple(scor)
-    print(scor)
-    #for i in range(0,8):
-    #   scores_rank.append(scores_rank[i][i])
-    sorted(scores_rank, key=attrgetter("score_p2"))
-    print(scores_rank)
+def final_ranking(tournoi):
+    ranking = {}
+    for i in range(0,7):
+        ranking.pop(tournoi.joueurs)
+        print(ranking)
 
+def main():
+
+    nom_tournoi = input("Entrez le nom du tournoi : ")
+    description = input("Description : ")
+    temps = input("Temps : ")
+    lieu = input("Lieu : ")
+    date_debut = str(datetime.datetime.now())
+    joueurs = create_players()
+    matchs1 = first_round(joueurs)
     tournees = []
-    tournees.append(Tour(liste_matchs,"Round 1"))
+    add_tour(tournees,matchs1)
+    ranking = get_ranking(matchs1)
+    matchs2 = next_round(ranking)
+    add_tour(tournees,matchs2)
+    ranking = get_ranking(matchs2)
+    matchs3 = next_round(ranking)
+    add_tour(tournees,matchs3)
+    ranking = get_ranking(matchs3)
+    matchs4 = next_round(ranking)
+    add_tour(tournees,matchs4)
+    date_fin = str(datetime.datetime.now())
 
+    tournoi = Tournoi(nom_tournoi,lieu,joueurs,tournees,temps,description)
+    tournoi.date_debut = date_debut
+    tournoi.date_fin = date_fin
+    final_ranking(tournoi)
 
-   # for tour in tournees:
-   #     print(tour.nom)
-   # print(tournees)
-    #tour1 = Tour(liste_matchs,"Round 1")
-
-#    tournoi = Tournoi("Mortal Kombat","Paris",players,"17/08",tournees,"Blitz","Combat Ultime")
-    #for joueur in tournoi.joueurs:
-       # print(joueur.prenom + " " + joueur.nom)
 
 main()
 
