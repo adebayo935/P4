@@ -115,9 +115,6 @@ def get_ranking(previous_matchs):
         ranking.append(player)
     for loser in losers:
         ranking.append(loser)
-
-    for i in range(0, 8):
-        print("Classé " + str(i + 1) + ": " + ranking[i].prenom)
     return ranking
 
 
@@ -128,8 +125,8 @@ def next_round(ranking):
     noms_matchs.append(ranking[2].prenom + " Versus " + ranking[3].prenom)
     noms_matchs.append(ranking[4].prenom + " Versus " + ranking[5].prenom)
     noms_matchs.append(ranking[6].prenom + " Versus " + ranking[7].prenom)
+    print("Matchs du tour : ")
     print(noms_matchs)
-
     for i in range(0, 4):
         print("Match " + str(i+1) + " " + str(noms_matchs[i]))
         score_p1 = input("Score J1: ")
@@ -140,11 +137,39 @@ def next_round(ranking):
         matchs.append(Match(ranking[6],ranking[7],score_p1,score_p2))
     return matchs
 
-def final_ranking(tournoi):
+
+def set_ranking(joueurs):
     ranking = {}
-    for i in range(0,7):
-        ranking.pop(tournoi.joueurs)
-        print(ranking)
+    print("Mettre à jour le classement général")
+    for joueur in joueurs:
+        print("Joueur "+joueur.prenom)
+        score = input("Score : ")
+        ranking[joueur] = int(score)
+    sorted(ranking.items(), key=lambda t: t[1])
+    print("Classement à jour :")
+    i = 1
+    for rank in ranking:
+        print("Classé "+str(i)+" : "+ rank.prenom+ " : " + str(ranking[rank])+"pts")
+        i += 1
+    return ranking
+
+
+def edit_ranking(ranking):
+    choice = input("Changer le classement général ? (O/N)")
+    if choice == "o":
+        for rank in ranking:
+            print("Joueur "+rank.prenom)
+            score = input("Entrez le score : ")
+            ranking[rank] |= int(score)
+        sorted(ranking.items(), key=lambda t: t[1])
+        print("Nouveau classement :")
+        i = 1
+        for rank in ranking:
+            print("Classé "+str(i)+" : "+rank.prenom+" : "+ranking[rank.prenom]+"pts")
+            i += 1
+    else:
+        pass
+    return ranking
 
 def main():
 
@@ -155,24 +180,27 @@ def main():
     date_debut = str(datetime.datetime.now())
     joueurs = create_players()
     matchs1 = first_round(joueurs)
+    final_ranking = set_ranking(joueurs)
     tournees = []
     add_tour(tournees,matchs1)
     ranking = get_ranking(matchs1)
     matchs2 = next_round(ranking)
+    final_ranking = edit_ranking(final_ranking)
     add_tour(tournees,matchs2)
     ranking = get_ranking(matchs2)
     matchs3 = next_round(ranking)
+    final_ranking = edit_ranking(final_ranking)
     add_tour(tournees,matchs3)
     ranking = get_ranking(matchs3)
     matchs4 = next_round(ranking)
+    final_ranking = edit_ranking(final_ranking)
     add_tour(tournees,matchs4)
     date_fin = str(datetime.datetime.now())
 
     tournoi = Tournoi(nom_tournoi,lieu,joueurs,tournees,temps,description)
     tournoi.date_debut = date_debut
     tournoi.date_fin = date_fin
-    final_ranking(tournoi)
-
+    edit_ranking(final_ranking)
 
 main()
 
