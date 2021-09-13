@@ -6,7 +6,6 @@ from views import add_round
 from views import edit_ranking
 from views import next_round
 from views import end_tournament
-from views import menu
 import datetime
 from tinydb import TinyDB
 
@@ -43,6 +42,8 @@ def get_ranking(previous_matchs):
 
 def create_tournament():
 
+    print("------- Nouveau Tournoi ------\n")
+
     # Start Tournament
     name_tournament = input("Entrez le nom du tournoi : ")
     description = input("Description : ")
@@ -54,7 +55,7 @@ def create_tournament():
     players = create_players()
 
     # Saving Players
-    serialized_players = {}
+    serialized_players = []
     for player in players:
         serialized_player = {
             'forename': player.forename,
@@ -63,93 +64,102 @@ def create_tournament():
             'sex': player.sex,
             'rank': player.rank
         }
-        serialized_players.pop(serialized_player)
-    db = TinyDB('db.json')
+        serialized_players.append(serialized_player)
+    db = TinyDB('db_players.json')
     players_table = db.table('players')
     players_table.truncate()
     players_table.insert_multiple(serialized_players)
 
-
-    # Round 1
     date_start_round = str(datetime.datetime.now())
-    games1 = first_round(players)
+    games = first_round(players)
     date_end_round = str(datetime.datetime.now())
     final_ranking = set_ranking(players)
     rounds = []
-    add_round(rounds,games1)
+    add_round(rounds,games)
     rounds[0].date_start = date_start_round
     rounds[0].date_end = date_end_round
-    ranking = get_ranking(games1)
 
-    # Round 2
-    date_start_round = str(datetime.datetime.now())
-    games2 = next_round(ranking)
-    date_end_round = str(datetime.datetime.now())
-    final_ranking = edit_ranking(final_ranking)
-    add_round(rounds,games2)
-    rounds[1].date_start = date_start_round
-    rounds[1].date_end = date_end_round
-    ranking = get_ranking(games2)
+    # Serializing Game
+    serialized_rounds = []
+    serialized_games = []
 
-    # Round 3
-    date_start_round = str(datetime.datetime.now())
-    games3 = next_round(ranking)
-    date_end_round = str(datetime.datetime.now())
-    final_ranking = edit_ranking(final_ranking)
-    add_round(rounds,games3)
-    rounds[2].date_start = date_start_round
-    rounds[2].date_end = date_end_round
-    ranking = get_ranking(games3)
+    for round in rounds:
 
+        for game in games:
+            serialized_game = {
+                "Player 1": game.p1.forename,
+                "Player 2": game.p2.forename,
+                "Score P1": game.score_p1,
+                "Score P2": game.score_p2
+            }
+            serialized_games.append(serialized_game)
 
-    # Round 4
-    date_start_round = str(datetime.datetime.now())
-    games4 = next_round(ranking)
-    date_end_round = str(datetime.datetime.now())
-    final_ranking = edit_ranking(final_ranking)
-    add_round(rounds,games4)
-    rounds[3].date_start = date_start_round
-    rounds[3].date_end = date_end_round
+        # Serializing Rounds
+        serialized_round = {
+            "date debut": round.date_start,
+            "date fin": round.date_end,
+            "Nom": round.name,
+            "Liste matchs": serialized_games
+        }
+        serialized_rounds.append(serialized_round)
 
-    # Ending Tournament
-    ending = input('Terminer le tournoi ?')
-    if ending == "n":
-        modify = input('Modifier classement général ?')
-        if modify == "y":
-            final_ranking = edit_ranking(final_ranking)
-        else:
-            print('Tournoi terminé')
-            pass
-    else:
-        print('Tournoi Terminé')
-        pass
+    ranking = get_ranking(games)
+
+    for i in range(1, 4):
+        date_start_round = str(datetime.datetime.now())
+        games = next_round(ranking)
+        date_end_round = str(datetime.datetime.now())
+        final_ranking = edit_ranking(final_ranking)
+        add_round(rounds,games)
+        rounds[i].date_start = date_start_round
+        rounds[i].date_end = date_end_round
+
+        for round in rounds:
+
+            # Serializing Games
+            for game in games:
+                serialized_game = {
+                    "Player 1": game.p1.forename,
+                    "Player 2": game.p2.forename,
+                    "Score P1": game.score_p1,
+                    "Score P2": game.score_p2
+                }
+                serialized_games.append(serialized_game)
+
+            # Serializing Rounds
+            serialized_round = {
+                "date début": round.date_start,
+                "date fin": round.date_end,
+                "Nom": round.name,
+                "Liste matchs": serialized_games
+            }
+            serialized_rounds.append(serialized_round)
+
+        ranking = get_ranking(games)
+
     tournaments = []
-    tournaments.append(Tournament(name_tournament,place,players,rounds,time,description))
+    tournaments.append(Tournament(name_tournament,place,time,players,rounds,description))
 
-    # Saving Tournament
-    serialized_tournaments = {}
     for tournament in tournaments:
+
+        end_tournament(tournament,date_start_tournament,final_ranking)
+
+        # Saving Tournament
+        serialized_tournaments = []
         end_tournament(tournament, date_start_tournament, final_ranking)
         serialized_tournament = {
             'name': tournament.name,
             'place': tournament.place,
-            'players': tournament.players,
-            'rounds': tournament.rounds,
+            'players': serialized_players,
+            'rounds': serialized_rounds,
             'time': tournament.time,
             'description': tournament.description,
             'date_start': tournament.date_start,
             'date_end': tournament.date_end,
             'nb_rounds': tournament.nb_rounds
         }
-        serialized_tournaments.pop(serialized_tournament)
-    db = TinyDB('db.json')
-    tournaments_table = db.table('tournaments')
-    tournaments_table.truncate()
-    tournaments_table.insert_multiple(serialized_tournaments)
-
-
-
-
-choice = menu()
-if int(choice) == 1:
-    create_tournament()
+        serialized_tournaments.append(serialized_tournament)
+        db = TinyDB('db_tournaments.json')
+        tournaments_table = db.table('tournaments')
+        tournaments_table.truncate()
+        tournaments_table.insert_multiple(serialized_tournaments)
