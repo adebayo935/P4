@@ -1,6 +1,7 @@
 from models import Player
 from models import Round
 from models import Game
+from reports import list_players
 import operator
 import datetime
 
@@ -40,7 +41,7 @@ def next_round(ranking):
     names_games.append(ranking[2].forename + " Versus " + ranking[3].forename)
     names_games.append(ranking[4].forename + " Versus " + ranking[5].forename)
     names_games.append(ranking[6].forename + " Versus " + ranking[7].forename)
-    print("Matchs du tour : ")
+    print("Matchs du prochain tour : ")
     print(names_games)
     for i in range(0, 4):
         print("Match " + str(i+1) + " " + str(names_games[i]))
@@ -70,8 +71,8 @@ def set_ranking(players):
 
 
 def edit_ranking(ranking):
-    choice = input("Changer le classement général ? (O/N)")
-    if choice == "o":
+    choice = input("Changer le classement général ? (Y/N)")
+    if choice == "y":
         for rank in ranking:
             print("Joueur "+rank.forename)
             score = input("Entrez le score : ")
@@ -105,21 +106,36 @@ def create_players():
 
 def end_tournament(tournament,date_start_tournament,final_ranking):
     end_tournament = input("Terminer le tournoi ? ")
-    if end_tournament == "o":
+    if end_tournament == "y":
         date_end_tournament = str(datetime.datetime.now())
         tournament.date_start = date_start_tournament
         tournament.date_end = date_end_tournament
+        print("Tournoi Terminé")
         pass
     else:
         modify_rank = input("Modifier classement général ?")
-        if modify_rank == "o":
+        if modify_rank == "y":
             edit_ranking(final_ranking)
 
 
 def menu():
 
-    menu = ["1. Nouveau Tournoi", "2. Charger Tournoi", "3. Sauvegarder Tournoi", "4. Rapports"]
+    print("1. Nouveau Tournoi\n")
+    print("2. Rapports\n")
     print("Bienvenue !\n")
     print(menu)
     choice = input("Votre choix : ")
     return choice
+
+
+def reports():
+
+    print("-------- Rapports --------\n")
+    print("1. Liste des joueurs\n")
+    print("2. Liste des joueurs par tournoi\n")
+    print("3. Liste de tous les tournois\n")
+    print("4. Liste des tours d'un tournoi\n")
+    print("5. Liste des matchs d'un tournoi\n")
+    choice = input("Votre choix : ")
+    if int(choice) == 1:
+        list_players()
