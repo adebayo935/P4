@@ -31,21 +31,33 @@ def serializing_games(games):
             "Score P2": game.score_p2
         }
         serialized_fake.append(serialized_game)
-    print(serialized_fake)
+        print(serialized_fake)
     return serialized_fake
 
 
-def serializing_rounds(rounds,serialized_games):
-    serialized_fake = []
-    for tour in rounds:
-        serialized_round = {
-            "date debut": tour.date_start,
-            "date fin": tour.date_end,
-            "Nom": tour.name,
-            "Liste matchs": serialized_games
-            }
-        serialized_fake.append(serialized_round)
-    return serialized_fake
+def serializing_first_round(rounds,serialized_games):
+    serialized_rounds = []
+    serialized_round = {
+        "date debut": rounds[0].date_start,
+        "date fin": rounds[0].date_end,
+        "Nom": rounds[0].name,
+        "Liste matchs": serialized_games
+        }
+    serialized_rounds.append(serialized_round)
+    print(serialized_rounds)
+    return serialized_rounds
+
+
+def serializing_rounds(serialized_rounds,rounds,serialized_games):
+    serialized_round = {
+        "date debut": rounds[-1].date_start,
+        "date fin": rounds[-1].date_end,
+        "Nom": rounds[-1].name,
+        "Liste matchs": serialized_games
+        }
+    serialized_rounds.append(serialized_round)
+    print(serialized_rounds)
+    return serialized_rounds
 
 
 def serializing_tournaments(tournament,serialized_players,serialized_rounds):
@@ -119,7 +131,7 @@ def create_tournament():
     add_round(rounds,games)
     rounds[0].date_start = date_start_round
     rounds[0].date_end = date_end_round
-    serialized_rounds.append(serializing_rounds(rounds,serialized_games))
+    serialized_rounds.append(serializing_first_round(rounds,serialized_games))
     ranking = get_ranking(games)
 
     for i in range(1, 4):
@@ -131,7 +143,7 @@ def create_tournament():
         add_round(rounds,games)
         rounds[i].date_start = date_start_round
         rounds[i].date_end = date_end_round
-        serialized_rounds.append(serializing_rounds(rounds,serialized_games))
+        serialized_rounds.append(serializing_rounds(serialized_rounds,rounds,serialized_games))
         ranking = get_ranking(games)
 
     tournament = Tournament(name_tournament,place,time,players,rounds,description)
