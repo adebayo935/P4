@@ -118,6 +118,7 @@ def list_rounds_tournament():
                       'Date de fin : ' + str(tour[0]['date fin']) + '\n' +
                       'Nom : ' + str(tour[0]['Nom']) + '\n' +
                       'Liste des matchs :\n')
+                o += 1
                 s = 1
                 for game in tour[0]['Liste matchs']:
                     print('Match ' + str(s) + '\n' +
@@ -126,7 +127,7 @@ def list_rounds_tournament():
                           'Score 1 : ' + str(game[0]['Score P1']) + '\n' +
                           'Score 2 : ' + str(game[0]['Score P2']) + '\n')
                     s += 1
-                o += 1
+            break
         else:
             i += 1
 
