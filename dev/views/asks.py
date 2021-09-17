@@ -8,7 +8,7 @@ import datetime
 def add_round(rounds, list_games):
     name = input("Entrez le nom du tour : ")
     rounds.append(Round(list_games, name))
-    return rounds
+    print(rounds)
 
 
 def ask_input(text):
@@ -34,12 +34,15 @@ def first_round(players):
     for i in range(0, 4):
         names_games.append(players_sup[i].forename + " Versus " + players_inf[i].forename)
     print(names_games)
-
+    k = 0
+    n = 0
     for i in range(0, 4):
-        print("Match " + str(i+1) + " " + str(names_games[i]))
+        print("Match " + str(i + 1) + " " + str(names_games[i]))
         score_p1 = input("Score J1: ")
         score_p2 = input("Score J2: ")
-        games.append(Game(players_sup[i], players_inf[i], score_p1, score_p2))
+        games.append(Game(players_sup[n], players_inf[k], score_p1, score_p2))
+        k += 1
+        n += 1
     return games
 
 
@@ -52,14 +55,15 @@ def next_round(ranking):
     names_games.append(ranking[6].forename + " Versus " + ranking[7].forename)
     print("Matchs du prochain tour : ")
     print(names_games)
+    n = 0
+    k = 1
     for i in range(0, 4):
         print("Match " + str(i+1) + " " + str(names_games[i]))
         score_p1 = input("Score J1: ")
         score_p2 = input("Score J2: ")
-        games.append(Game(ranking[0],ranking[1],score_p1,score_p2))
-        games.append(Game(ranking[2],ranking[3],score_p1,score_p2))
-        games.append(Game(ranking[4],ranking[5],score_p1,score_p2))
-        games.append(Game(ranking[6],ranking[7],score_p1,score_p2))
+        games.append(Game(ranking[n],ranking[k],score_p1,score_p2))
+        k += 2
+        n += 2
     return games
 
 
@@ -80,6 +84,7 @@ def set_ranking(players):
 
 
 def edit_ranking(ranking):
+    ranking_fake = []
     print("Classement du Tournoi\n")
     for rank in ranking:
         print("Joueur "+rank.forename)
@@ -91,6 +96,7 @@ def edit_ranking(ranking):
     i = 1
     for rank in sorted_rank:
         print("Classé "+str(i)+" : "+rank.forename+" : "+str(ranking[rank])+"pts")
+        ranking_fake.append(rank)
         i += 1
     return ranking
 
