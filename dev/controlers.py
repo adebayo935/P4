@@ -1,151 +1,158 @@
-from dev.models import Tournament
-from dev.views.asks import create_players, first_round, set_ranking, add_round, edit_ranking, next_round, end_tournament,ask_input, print_text
-import datetime
-from tinydb import TinyDB
+import json
+
+file = json.load(open("dev/db_tournaments.json"))
 
 
-def serializing_players(players):
-    serialized_players = []
-    for player in players:
-        serialized_player = {
-            'forename': player.forename,
-            'name': player.name,
-            'date': player.date,
-            'sex': player.sex,
-            'rank': player.rank
-        }
-        serialized_players.append(serialized_player)
-        db = TinyDB('dev/db_tournaments.json')
-        players_table = db.table('players')
-        players_table.insert_multiple(serialized_players)
-    return serialized_players
+def list_players():
+    print("--- Liste des joueurs ---\n")
+    print("1. Par classement\n")
+    print("2. Par ordre alphabétique\n")
+    choice = input("Votre choix : ")
+
+    #sorted_players = sorted(file['players'], key=lambda x: x[1])
+    #print(sorted_players)
+
+    if int(choice) == 1:
+        for f in range(1,9):
+            i = 1
+            if file['players'][str(i)]:
+                if f == int(file['players'][str(i)]['rank']):
+                    print('Classé ' + str(f) + '\n' +
+                          'Prenom : ' + file['players'][str(i)]['forename'] + '\n' +
+                          'Nom : ' + file['players'][str(i)]['name'] + '\n' +
+                          'Date de naissance : ' + str(file['players'][str(i)]['date']) + '\n' +
+                          'Sexe : ' + str(file['players'][str(i)]['sex']) + '\n' +
+                          'Classement : ' + str(file['players'][str(i)]['rank']) + '\n')
+                    i += 1
+                else:
+                    i += 1
+            else:
+                pass
 
 
-def serializing_games(games):
-    serialized_fake = []
-    for game in games:
-        serialized_game = {
-            "Player 1": game.p1.forename,
-            "Player 2": game.p2.forename,
-            "Score P1": game.score_p1,
-            "Score P2": game.score_p2
-        }
-        serialized_fake.append(serialized_game)
-        print(serialized_fake)
-    return serialized_fake
+# else:
+#      i = 1
+#      while file['players']:
+#         items = list((file['players'][str(i)].items()))
+#         new_items = tuple(items)
+#           print(items)
+#         print(new_items)
+#           newfile = sorted(items, key=itemgetter(1)(0))
+#           print(newfile)
+#            i += 1
+#         continue
 
 
-def serializing_first_round(rounds,serialized_games):
-    serialized_rounds = []
-    serialized_round = {
-        "date debut": rounds[0].date_start,
-        "date fin": rounds[0].date_end,
-        "Nom": rounds[0].name,
-        "Liste matchs": serialized_games
-        }
-    serialized_rounds.append(serialized_round)
-    print(serialized_rounds)
-    return serialized_rounds
+def list_players_tournament():
+    print("--- Liste des joueurs par tournoi ---\n")
+    choice = input("Entrez le nom du tournoi : ")
 
-
-def serializing_rounds(serialized_rounds,rounds,serialized_games):
-    serialized_round = {
-        "date debut": rounds[-1].date_start,
-        "date fin": rounds[-1].date_end,
-        "Nom": rounds[-1].name,
-        "Liste matchs": serialized_games
-        }
-    serialized_rounds.append(serialized_round)
-    print(serialized_rounds)
-    return serialized_rounds
-
-
-def serializing_tournaments(tournament,serialized_players,serialized_rounds):
-    serialized_tournaments = []
-    serialized_tournament = {
-        'name': tournament.name,
-        'place': tournament.place,
-        'players': serialized_players,
-        'rounds': serialized_rounds,
-        'time': tournament.time,
-        'description': tournament.description,
-        'date_start': tournament.date_start,
-        'date_end': tournament.date_end,
-        'nb_rounds': tournament.nb_rounds
-    }
-    serialized_tournaments.append(serialized_tournament)
-    db = TinyDB('dev/db_tournaments.json')
-    tournaments_table = db.table('tournaments')
-    tournaments_table.insert_multiple(serialized_tournaments)
-
-
-def get_ranking(previous_matchs):
-    ranking = []
-    winners = []
-    tied = []
-    losers = []
-    for i in range(0,4):
-        if previous_matchs[i].score_p1 > previous_matchs[i].score_p2:
-            winners.append(previous_matchs[i].p1)
-            losers.append(previous_matchs[i].p2)
-        elif previous_matchs[i].score_p2 > previous_matchs[i].score_p1:
-            winners.append(previous_matchs[i].p2)
-            losers.append(previous_matchs[i].p1)
+    i = 1
+    while file['tournaments'][str(i)]:
+        if file['tournaments'][str(i)]['name'] == choice:
+            o = 1
+            for player in file['tournaments'][str(i)]['players']:
+                print('Player ' + str(o) + '\n' +
+                      'Prenom : ' + player['forename'] + '\n' +
+                      'Nom : ' + player['name'] + '\n' +
+                      'Date de naissance : ' + str(player['date']) + '\n' +
+                      'Sexe : ' + str(player['sex']) + '\n' +
+                      'Classement : ' + str(player['rank']) + '\n')
+                o += 1
+            break
         else:
-            tied.append(previous_matchs[i].p1)
-            tied.append(previous_matchs[i].p2)
-
-    winners.sort()
-    losers.sort()
-    tied.sort()
-
-    for winner in winners:
-        ranking.append(winner)
-    for player in tied:
-        ranking.append(player)
-    for loser in losers:
-        ranking.append(loser)
-    return ranking
+            i += 1
 
 
-def create_tournament():
-    print_text("------- Nouveau Tournoi ------\n")
-    name_tournament = ask_input('Entrez le nom du tournoi : ')
-    description = ask_input("Description : ")
-    time = ask_input("Temps : ")
-    place = ask_input("Lieu : ")
-    date_start_tournament = str(datetime.datetime.now())
+def list_tournaments():
+    print("--- Liste de tous les tournois ---\n")
 
-    serialized_rounds = []
-    serialized_games = []
+    i = 1
+    while file['tournaments'][str(i)]:
+        print('Tournoi ' + str(i) + '\n' +
+              'Nom : ' + str(file['tournaments'][str(i)]['name']) + '\n' +
+              'Lieu : ' + str(file['tournaments'][str(i)]['place']) + '\n' +
+              'Temps : ' + str(file['tournaments'][str(i)]['time']) + '\n' +
+              'Description: ' + str(file['tournaments'][str(i)]['description']) + '\n\n' +
+              'Liste des Joueurs :')
+        o = 1
+        for player in file['tournaments'][str(i)]['players']:
+            print('Player ' + str(o) + '\n' +
+                  'Prenom : ' + str(player['forename']) + '\n' +
+                  'Nom : ' + str(player['name']) + '\n' +
+                  'Date de naissance : ' + str(player['date']) + '\n' +
+                  'Sexe : ' + str(player['sex']) + '\n' +
+                  'Classement : ' + str(player['rank']) + '\n')
+            o += 1
+        print('Liste des tours :')
+        o = 1
+        for tour in file['tournaments'][str(i)]['rounds']:
+            print('Tour  ' + str(o) + '\n' +
+                  'Date de début : ' + str(tour['date debut']) + '\n' +
+                  'Date de fin : ' + str(tour['date fin']) + '\n' +
+                  'Nom : ' + str(tour['Nom']) + '\n' +
+                  'Liste des matchs :\n')
+            s = 1
+            for game in tour['Liste matchs']:
+                print('Match ' + str(s) + '\n' +
+                      'Joueur 1 : ' + str(game['Player 1']) + '\n' +
+                      'Joueur 2 : ' + str(game['Player 2']) + '\n' +
+                      'Score 1 : ' + str(game['Score P1']) + '\n' +
+                      'Score 2 : ' + str(game['Score P2']) + '\n')
+                s += 1
+            o += 1
+        i += 1
+        break
 
-    players = create_players()
-    serialized_players = serializing_players(players)
 
-    date_start_round = str(datetime.datetime.now())
-    games = first_round(players)
-    serialized_games.append(serializing_games(games))
-    date_end_round = str(datetime.datetime.now())
-    final_ranking = set_ranking(players)
-    rounds = []
-    add_round(rounds,games)
-    rounds[0].date_start = date_start_round
-    rounds[0].date_end = date_end_round
-    serialized_rounds.append(serializing_first_round(rounds,serialized_games))
-    ranking = get_ranking(games)
+def list_rounds_tournament():
+    print("--- Liste des tours d'un tournoi ---\n")
+    choice = input("Entrez le nom du tournoi : ")
 
-    for i in range(1, 4):
-        date_start_round = str(datetime.datetime.now())
-        games = next_round(ranking)
-        serialized_games.append(serializing_games(games))
-        date_end_round = str(datetime.datetime.now())
-        final_ranking = edit_ranking(final_ranking)
-        add_round(rounds,games)
-        rounds[i].date_start = date_start_round
-        rounds[i].date_end = date_end_round
-        serialized_rounds.append(serializing_rounds(serialized_rounds,rounds,serialized_games))
-        ranking = get_ranking(games)
+    i = 1
+    while file['tournaments'][str(i)]:
+        if file['tournaments'][str(i)]['name'] == choice:
+            print('Liste des tours :')
+            o = 1
+            for tour in file['tournaments'][str(i)]['rounds']:
+                print('Tour  ' + str(o) + '\n' +
+                      'Date de début : ' + str(tour['date debut']) + '\n' +
+                      'Date de fin : ' + str(tour['date fin']) + '\n' +
+                      'Nom : ' + str(tour['Nom']) + '\n' +
+                      'Liste des matchs :\n')
+                o += 1
+                s = 1
+                for game in tour['Liste matchs']:
+                    print('Match ' + str(s) + '\n' +
+                          'Joueur 1 : ' + str(game['Player 1']) + '\n' +
+                          'Joueur 2 : ' + str(game['Player 2']) + '\n' +
+                          'Score 1 : ' + str(game['Score P1']) + '\n' +
+                          'Score 2 : ' + str(game['Score P2']) + '\n')
+                    s += 1
+            break
+        else:
+            i += 1
 
-    tournament = Tournament(name_tournament,place,time,players,rounds,description)
-    end_tournament(tournament,date_start_tournament,players)
-    serializing_tournaments(tournament,serialized_players,serialized_rounds)
+
+def list_games_tournament():
+    print("--- Liste des matchs d'un tournoi ---\n")
+    choice = input("Entrez le nom du tournoi : ")
+
+    i = 1
+    while file['tournaments'][str(i)]:
+        if file['tournaments'][str(i)]['name'] == choice:
+            o = 1
+            for tour in file['tournaments'][str(i)]['rounds']:
+                print('Tour  ' + str(o) + '\n')
+                o += 1
+                s = 1
+                for game in tour['Liste matchs']:
+                    print('Match ' + str(s) + '\n' +
+                          'Joueur 1 : ' + str(game['Player 1']) + '\n' +
+                          'Joueur 2 : ' + str(game['Player 2']) + '\n' +
+                          'Score 1 : ' + str(game['Score P1']) + '\n' +
+                          'Score 2 : ' + str(game['Score P2']) + '\n')
+                    s += 1
+            break
+        else:
+            i += 1
