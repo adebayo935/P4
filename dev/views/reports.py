@@ -1,4 +1,5 @@
 import json
+from tinydb import TinyDB
 
 file = json.load(open("dev/db_tournaments.json"))
 
@@ -9,38 +10,26 @@ def list_players():
     print("2. Par ordre alphabétique\n")
     choice = input("Votre choix : ")
 
-    #sorted_players = sorted(file['players'], key=lambda x: x[1])
-    #print(sorted_players)
+    db = TinyDB('dev/db_tournaments.json')
+    players_table = db.table('players')
+    players = players_table.all()
 
     if int(choice) == 1:
-        for f in range(1,9):
-            i = 1
-            if file['players'][str(i)]:
-                if f == int(file['players'][str(i)]['rank']):
-                    print('Classé ' + str(f) + '\n' +
-                          'Prenom : ' + file['players'][str(i)]['forename'] + '\n' +
-                          'Nom : ' + file['players'][str(i)]['name'] + '\n' +
-                          'Date de naissance : ' + str(file['players'][str(i)]['date']) + '\n' +
-                          'Sexe : ' + str(file['players'][str(i)]['sex']) + '\n' +
-                          'Classement : ' + str(file['players'][str(i)]['rank']) + '\n')
-                    i += 1
-                else:
-                    i += 1
-            else:
-                pass
-
-
-# else:
-#      i = 1
-#      while file['players']:
-#         items = list((file['players'][str(i)].items()))
-#         new_items = tuple(items)
-#           print(items)
-#         print(new_items)
-#           newfile = sorted(items, key=itemgetter(1)(0))
-#           print(newfile)
-#            i += 1
-#         continue
+        sorted_players = sorted(players, key=lambda k: k['rank'])
+        for player in sorted_players:
+            print('Prenom : ' + str(player['forename']) + '\n' +
+                  'Nom : ' + str(player['name']) + '\n' +
+                  'Date de naissance : ' + str(player['date']) + '\n' +
+                  'Sexe : ' + str(player['sex']) + '\n' +
+                  'Classement : ' + str(player['rank']) + '\n')
+    elif int(choice) == 2:
+        sorted_players = sorted(players, key=lambda k: k['forename'])
+        for player in sorted_players:
+            print('Prenom : ' + str(player['forename']) + '\n' +
+                  'Nom : ' + str(player['name']) + '\n' +
+                  'Date de naissance : ' + str(player['date']) + '\n' +
+                  'Sexe : ' + str(player['sex']) + '\n' +
+                  'Classement : ' + str(player['rank']) + '\n')
 
 
 def list_players_tournament():
