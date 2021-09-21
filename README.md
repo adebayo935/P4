@@ -99,9 +99,9 @@ la fonction list_games_tournaments affiche tous les matchs d'un tournoi
 
 
 
-## Lancement du scrapping
+## Lancement du programme
 
-Pour pouvoir utiliser le projet, il vous faudra au préalable récupérer l'intégralité du dossier OC_P2_Projet.
+Pour pouvoir utiliser le projet, il vous faudra au préalable récupérer l'intégralité du dossier OC_P4_Projet.
 
 Dans un premier temps, vous devez cloner le projet puis installer les modules présents dans le fichier requirements.txt, dans votre environnement python.
 
