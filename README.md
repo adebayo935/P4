@@ -4,6 +4,11 @@
 
 Ce projet a pour but la création, sauvegarde, et consultation d'un tournoi d'échecs.
 
+
+```Fichier main.py```
+
+affiche l'interface principale du programme et redirige vers les deux sous-programmes "nouveau tournoi" et "rapports"
+
 ```Fichier controlers.py```
 
 Contient l'ensemble des intructions invisibles du programme.
