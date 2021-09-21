@@ -1,5 +1,5 @@
-from dev.views.asks import menu, reports
-from dev.controlers import create_tournament
+from game.views.asks import menu, reports
+from game.controlers import create_tournament
 
 
 choice = menu()
