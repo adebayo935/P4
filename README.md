@@ -115,4 +115,16 @@ Linux/Mac
 python main.py
 ```
 
+### Générer le rapport flake8
 
+tapez cette commande :
+
+```bash
+pip install flake8-html
+```
+
+puis :
+
+```bash
+flake8 --format=html --htmldir=flake-report
+```
