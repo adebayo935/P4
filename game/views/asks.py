@@ -62,7 +62,8 @@ def next_round(ranking):
     n = 0
     k = 1
     for game_index in range(0, 4):
-        print("Match " + str(game_index + 1) + " : " + str(ranking[n][0].forename)
+        print("Match " + str(game_index + 1) + " : " +
+              str(ranking[n][0].forename)
               + ' VS ' + str(ranking[k][0].forename))
         score_p1 = input("Score J1: ")
         score_p2 = input("Score J2: ")
