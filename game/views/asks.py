@@ -8,9 +8,6 @@ import datetime
 def add_round(rounds, list_games):
     name = input("Entrez le nom du tour : ")
     rounds.append(Round(list_games, name))
-    print(rounds)
-    for tour in rounds:
-        print(tour.name)
 
 
 def ask_input(text):
@@ -47,16 +44,44 @@ def first_round(players):
                           score_p1, score_p2))
         k += 1
         n += 1
-    for game in games:
-        print(game.score_p1 + " " + game.score_p2)
     return games
+
+
+def first_option(ranking, games):
+    print("Match " + str(1) + " : " +
+          str(ranking[0][0].forename)
+          + ' VS ' + str(ranking[2][0].forename))
+    score_p1 = input("Score J1: ")
+    score_p2 = input("Score J2: ")
+    games.append(Game(ranking[0][0], ranking[2][0], score_p1, score_p2))
+    print("Match " + str(2) + " : " +
+          str(ranking[1][0].forename)
+          + ' VS ' + str(ranking[3][0].forename))
+    score_p1 = input("Score J1: ")
+    score_p2 = input("Score J2: ")
+    games.append(Game(ranking[1][0], ranking[3][0], score_p1, score_p2))
+    print("Match " + str(3) + " : " +
+          str(ranking[4][0].forename)
+          + ' VS ' + str(ranking[5][0].forename))
+    score_p1 = input("Score J1: ")
+    score_p2 = input("Score J2: ")
+    games.append(Game(ranking[4][0], ranking[5][0], score_p1, score_p2))
+    print("Match " + str(4) + " : " +
+          str(ranking[6][0].forename)
+          + ' VS ' + str(ranking[7][0].forename))
+    score_p1 = input("Score J1: ")
+    score_p2 = input("Score J2: ")
+    games.append(Game(ranking[6][0], ranking[7][0], score_p1, score_p2))
 
 
 def next_round(ranking):
     games = []
-    print(ranking[0][0].forename + " Versus " + ranking[1][0].forename + '\n' +
-          ranking[2][0].forename + " Versus " + ranking[3][0].forename + '\n' +
-          ranking[4][0].forename + " Versus " + ranking[5][0].forename + '\n' +
+    print(ranking[0][0].forename + " Versus " + ranking[1][0].forename +
+          '\n' +
+          ranking[2][0].forename + " Versus " + ranking[3][0].forename +
+          '\n' +
+          ranking[4][0].forename + " Versus " + ranking[5][0].forename +
+          '\n' +
           ranking[6][0].forename + " Versus " + ranking[7][0].forename)
     print("Matchs du prochain tour : ")
     n = 0
@@ -67,9 +92,47 @@ def next_round(ranking):
               + ' VS ' + str(ranking[k][0].forename))
         score_p1 = input("Score J1: ")
         score_p2 = input("Score J2: ")
-        games.append(Game(ranking[n][0], ranking[k][0], score_p1, score_p2))
+        games.append(Game(ranking[n][0], ranking[k][0],
+                          score_p1, score_p2))
         k += 2
         n += 2
+    return games
+
+
+def final_round(ranking, previous_ranking):
+    games = []
+    if previous_ranking[0][0].forename == ranking[0][0].forename \
+            and previous_ranking[1][0].forename == ranking[1][0].forename:
+        print(ranking[0][0].forename + " Versus " + ranking[2][0].forename +
+              '\n' +
+              ranking[1][0].forename + " Versus " + ranking[3][0].forename +
+              '\n' +
+              ranking[4][0].forename + " Versus " + ranking[5][0].forename +
+              '\n' +
+              ranking[6][0].forename + " Versus " + ranking[7][0].forename)
+        print("Matchs du prochain tour : ")
+        first_option(ranking, games)
+    else:
+        print(ranking[0][0].forename + " Versus " + ranking[1][0].forename +
+              '\n' +
+              ranking[2][0].forename + " Versus " + ranking[3][0].forename +
+              '\n' +
+              ranking[4][0].forename + " Versus " + ranking[5][0].forename +
+              '\n' +
+              ranking[6][0].forename + " Versus " + ranking[7][0].forename)
+        print("Matchs du prochain tour : ")
+        n = 0
+        k = 1
+        for game_index in range(0, 4):
+            print("Match " + str(game_index + 1) + " : " +
+                  str(ranking[n][0].forename)
+                  + ' VS ' + str(ranking[k][0].forename))
+            score_p1 = input("Score J1: ")
+            score_p2 = input("Score J2: ")
+            games.append(Game(ranking[n][0], ranking[k][0],
+                              score_p1, score_p2))
+            k += 2
+            n += 2
     return games
 
 
@@ -113,7 +176,7 @@ def players_ranking(players):
     for player in players:
         print("Joueur " + player.forename)
         rank = input("Entrez le classement : ")
-        player.rank = rank
+        player.rank = int(rank)
 
 
 def create_players():
@@ -131,8 +194,8 @@ def create_players():
 
 
 def end_tournament(tournament, date_start_tournament, players):
-    text = input("Terminer le tournoi ? ")
-    print("1. Terminer\n2.Modifier classement joueurs")
+    print("Terminer ?\n1. Terminer\n2.Modifier classement joueurs")
+    text = input("Votre choix : ")
     if int(text) == 1:
         date_end_tournament = str(datetime.datetime.now())
         tournament.date_start = date_start_tournament
@@ -140,7 +203,11 @@ def end_tournament(tournament, date_start_tournament, players):
         print("Tournoi Terminé")
         pass
     elif int(text) == 2:
+        date_end_tournament = str(datetime.datetime.now())
+        tournament.date_start = date_start_tournament
+        tournament.date_end = date_end_tournament
         players_ranking(players)
+        print("Tournoi Terminé")
         pass
 
 

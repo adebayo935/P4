@@ -1,7 +1,7 @@
 from game.models import Tournament
 from game.views.asks import create_players, first_round, \
     set_ranking, add_round, edit_ranking, next_round, \
-    end_tournament, ask_input, print_text
+    end_tournament, ask_input, print_text, final_round
 import datetime
 from tinydb import TinyDB
 
@@ -104,9 +104,22 @@ def serializing_tournaments(tournament, serialized_players, serialized_rounds):
     tournaments_table.insert(serialized_tournament)
 
 
-def make_round(name_round, i, rounds, serialized_rounds):
+def make_round_two(name_round,  i, rounds, serialized_rounds):
     date_start_round = str(datetime.datetime.now())
     games = next_round(name_round)
+    serialized_games = serializing_games(games)
+    date_end_round = str(datetime.datetime.now())
+    final_ranking = edit_ranking(name_round)
+    add_round(rounds, games)
+    rounds[i].date_start = date_start_round
+    rounds[i].date_end = date_end_round
+    saving_round(serialized_rounds, rounds, serialized_games)
+    return final_ranking
+
+
+def make_round(name_round, previous_ranking,  i, rounds, serialized_rounds):
+    date_start_round = str(datetime.datetime.now())
+    games = final_round(name_round, previous_ranking)
     serialized_games = serializing_games(games)
     date_end_round = str(datetime.datetime.now())
     final_ranking = edit_ranking(name_round)
@@ -138,9 +151,11 @@ def create_tournament():
     rounds[0].date_start = date_start_round
     rounds[0].date_end = date_end_round
     serialized_rounds = saving_first_round(rounds, serialized_games)
-    second_round = make_round(ranking, 1, rounds, serialized_rounds)
-    third_round = make_round(second_round, 2, rounds, serialized_rounds)
-    make_round(third_round, 3, rounds, serialized_rounds)
+
+    second_round = make_round_two(ranking, 1, rounds, serialized_rounds)
+    third_round = make_round(second_round, ranking, 2,
+                             rounds, serialized_rounds)
+    make_round(third_round, second_round,  3, rounds, serialized_rounds)
 
     tournament = Tournament(name_tournament, place, time,
                             players, rounds, description)
