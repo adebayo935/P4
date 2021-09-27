@@ -6,6 +6,37 @@ import datetime
 from tinydb import TinyDB
 
 
+def saving_players(players):
+    serialized_players = []
+    saving = ask_input("Sauvegarder ?")
+    if int(saving) == 1:
+        serialized_players = serializing_players(players)
+        pass
+    else:
+        pass
+    return serialized_players
+
+
+def saving_first_round(rounds, serialized_games):
+    serialized_rounds = []
+    saving = ask_input("Sauvegarder ?")
+    if int(saving) == 1:
+        serialized_rounds = [serializing_first_round(rounds, serialized_games)]
+        pass
+    else:
+        pass
+    return serialized_rounds
+
+
+def saving_round(serialized_rounds, rounds, serialized_games):
+    saving = ask_input("Sauvegarder ?")
+    if int(saving) == 1:
+        serialized_rounds.append(serializing_round(rounds, serialized_games))
+        pass
+    else:
+        pass
+
+
 def serializing_players(players):
     serialized_players = []
     for player in players:
@@ -73,33 +104,17 @@ def serializing_tournaments(tournament, serialized_players, serialized_rounds):
     tournaments_table.insert(serialized_tournament)
 
 
-def get_ranking(previous_matchs):
-    ranking = []
-    winners = []
-    tied = []
-    losers = []
-    for i in range(0, 4):
-        if previous_matchs[i].score_p1 > previous_matchs[i].score_p2:
-            winners.append(previous_matchs[i].p1)
-            losers.append(previous_matchs[i].p2)
-        elif previous_matchs[i].score_p2 > previous_matchs[i].score_p1:
-            winners.append(previous_matchs[i].p2)
-            losers.append(previous_matchs[i].p1)
-        else:
-            tied.append(previous_matchs[i].p1)
-            tied.append(previous_matchs[i].p2)
-
-    winners.sort()
-    losers.sort()
-    tied.sort()
-
-    for winner in winners:
-        ranking.append(winner)
-    for player in tied:
-        ranking.append(player)
-    for loser in losers:
-        ranking.append(loser)
-    return ranking
+def make_round(name_round, i, rounds, serialized_rounds):
+    date_start_round = str(datetime.datetime.now())
+    games = next_round(name_round)
+    serialized_games = serializing_games(games)
+    date_end_round = str(datetime.datetime.now())
+    final_ranking = edit_ranking(name_round)
+    add_round(rounds, games)
+    rounds[i].date_start = date_start_round
+    rounds[i].date_end = date_end_round
+    saving_round(serialized_rounds, rounds, serialized_games)
+    return final_ranking
 
 
 def create_tournament():
@@ -110,34 +125,22 @@ def create_tournament():
     place = ask_input("Lieu : ")
     date_start_tournament = str(datetime.datetime.now())
 
-    serialized_rounds = []
-
     players = create_players()
-    serialized_players = serializing_players(players)
+    serialized_players = saving_players(players)
 
     date_start_round = str(datetime.datetime.now())
     games = first_round(players)
     serialized_games = serializing_games(games)
     date_end_round = str(datetime.datetime.now())
-    final_ranking = set_ranking(players)
+    ranking = set_ranking(players)
     rounds = []
     add_round(rounds, games)
     rounds[0].date_start = date_start_round
     rounds[0].date_end = date_end_round
-    serialized_rounds.append(serializing_first_round(rounds, serialized_games))
-    ranking = get_ranking(games)
-
-    for i in range(1, 4):
-        date_start_round = str(datetime.datetime.now())
-        games = next_round(ranking)
-        serialized_games = serializing_games(games)
-        date_end_round = str(datetime.datetime.now())
-        final_ranking = edit_ranking(final_ranking)
-        add_round(rounds, games)
-        rounds[i].date_start = date_start_round
-        rounds[i].date_end = date_end_round
-        serialized_rounds.append(serializing_round(rounds, serialized_games))
-        ranking = get_ranking(games)
+    serialized_rounds = saving_first_round(rounds, serialized_games)
+    second_round = make_round(ranking, 1, rounds, serialized_rounds)
+    third_round = make_round(second_round, 2, rounds, serialized_rounds)
+    make_round(third_round, 3, rounds, serialized_rounds)
 
     tournament = Tournament(name_tournament, place, time,
                             players, rounds, description)

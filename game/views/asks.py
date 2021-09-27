@@ -1,8 +1,7 @@
 from game.models import Player, Round, Game
-from game.views.reports import list_players, list_players_tournament,\
+from game.views.reports import list_players, list_players_tournament, \
     list_tournaments, list_rounds_tournament, \
     list_games_tournament
-import operator
 import datetime
 
 
@@ -54,64 +53,59 @@ def first_round(players):
 
 
 def next_round(ranking):
-    names_games = []
     games = []
-    names_games.append(ranking[0].forename + " Versus " + ranking[1].forename)
-    names_games.append(ranking[2].forename + " Versus " + ranking[3].forename)
-    names_games.append(ranking[4].forename + " Versus " + ranking[5].forename)
-    names_games.append(ranking[6].forename + " Versus " + ranking[7].forename)
+    print(ranking[0][0].forename + " Versus " + ranking[1][0].forename + '\n' +
+          ranking[2][0].forename + " Versus " + ranking[3][0].forename + '\n' +
+          ranking[4][0].forename + " Versus " + ranking[5][0].forename + '\n' +
+          ranking[6][0].forename + " Versus " + ranking[7][0].forename)
     print("Matchs du prochain tour : ")
-    print(names_games)
     n = 0
     k = 1
-    for i in range(0, 4):
-        print("Match " + str(i + 1) + " " + str(names_games[i]))
+    for game_index in range(0, 4):
+        print("Match " + str(game_index + 1) + " : " + str(ranking[n][0].forename)
+              + ' VS ' + str(ranking[k][0].forename))
         score_p1 = input("Score J1: ")
         score_p2 = input("Score J2: ")
-        games.append(Game(ranking[n], ranking[k], score_p1, score_p2))
+        games.append(Game(ranking[n][0], ranking[k][0], score_p1, score_p2))
         k += 2
         n += 2
-
-    for game in games:
-        print(game.score_p1 + " " + game.score_p2)
     return games
 
 
 def set_ranking(players):
-    ranking = {}
+    ranking = []
     print("Mettre à jour le classement général")
     for player in players:
         print("Joueur " + player.forename)
         score = input("Score : ")
-        ranking[player] = float(score)
-    sorted(ranking.items(), key=lambda t: t[1])
+        ranking.append([player, float(score)])
+    sorted_rank = sorted(ranking, key=lambda k_v: k_v[1],
+                         reverse=True)
+    print(ranking)
     print("Classement à jour :")
     i = 1
-    for rank in ranking:
-        print("Classé " + str(i) + " : " + rank.forename + " : " +
-              str(ranking[rank]) + " pts")
+    for rank in sorted_rank:
+        print("Classé " + str(i) + " : " + rank[0].forename +
+              " : " + str(rank[1]) + " pts")
         i += 1
     return ranking
 
 
 def edit_ranking(ranking):
-    ranking_fake = []
     print("Classement du Tournoi\n")
     for rank in ranking:
-        print("Joueur " + rank.forename)
+        print("Joueur " + rank[0].forename)
         score = input("Entrez le score : ")
-        ranking[rank] = float(score) + float(ranking[rank])
-    sorted_rank = sorted(ranking.items(), key=operator.itemgetter(1),
+        rank[1] += float(score)
+    sorted_rank = sorted(ranking, key=lambda k_v: k_v[1],
                          reverse=True)
-    sorted_rank = dict(sorted_rank)
     print("Nouveau classement :")
     i = 1
     for rank in sorted_rank:
-        print("Classé " + str(i) + " : " + rank.forename + " : " +
-              str(ranking[rank]) + "pts")
-        ranking_fake.append(rank)
+        print("Classé " + str(i) + " : " + rank[0].forename + " : " +
+              str(rank[1]) + "pts")
         i += 1
-    return ranking
+    return sorted_rank
 
 
 def players_ranking(players):
@@ -137,16 +131,16 @@ def create_players():
 
 def end_tournament(tournament, date_start_tournament, players):
     text = input("Terminer le tournoi ? ")
-    if str(text) == "y" or "Y":
+    print("1. Terminer\n2.Modifier classement joueurs")
+    if int(text) == 1:
         date_end_tournament = str(datetime.datetime.now())
         tournament.date_start = date_start_tournament
         tournament.date_end = date_end_tournament
         print("Tournoi Terminé")
         pass
-    else:
-        modify_rank = input("Modifier classement joueurs ?")
-        if modify_rank == "y" or "Y":
-            players_ranking(players)
+    elif int(text) == 2:
+        players_ranking(players)
+        pass
 
 
 def menu():
