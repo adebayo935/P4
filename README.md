@@ -4,6 +4,7 @@
 
 Ce projet a pour but la création, sauvegarde, et consultation d'un tournoi d'échecs.
 
+L'ensemble des choix se fait via 1 pour "oui" et 2 pour "non" ( sauf précisions )
 
 ```Fichier main.py```
 
